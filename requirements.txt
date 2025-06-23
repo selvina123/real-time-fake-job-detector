@@ -1,7 +1,8 @@
 streamlit
-joblib
 scikit-learn
-shap
+lime
+pandas
+numpy
 matplotlib
-python-dotenv
+email-validator
 

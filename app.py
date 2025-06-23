@@ -1,45 +1,108 @@
-from utils.bert_predict import predict_fake_job_bert
-from utils.utils_logger import log_prediction
-from utils.utils_email_alert import send_alert_email
 import streamlit as st
+import base64
+import time
+import streamlit.components.v1 as components
+from pathlib import Path
+from utils.utils_predict import predict_fake_job
+from utils.utils_email_alert import send_alert_email
+from utils.utils_dashboard import plot_prediction_bar, plot_confidence_gauge
+from utils.utils_explain_model import explain_prediction
 
-st.set_page_config(page_title="🚨 BERT Fake Job Detector", layout="centered")
+# --- Page Config ---
+st.set_page_config(page_title="🚨 Fake Job Detector", layout="wide")
 
-# Modern UI Styling
-st.markdown("""
+# --- Background Styling ---
+st.markdown(
+    """
     <style>
-    .main { background-color: #121212; color: #FFFFFF; font-family: 'Segoe UI'; }
-    h1, h2 { color: #FF5F6D; }
-    .stButton>button {
-        background-color: #6C63FF; color: white;
-        font-weight: bold; padding: 0.5em 2em;
-        border-radius: 6px;
+    .stApp {
+        background-image: url("assets/background.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
     }
-    footer { visibility: hidden; }
+
+    .block-container {
+        background-color: rgba(0, 0, 0, 0.6);
+        padding: 2rem;
+        border-radius: 15px;
+    }
+
+    textarea, .stTextInput>div>input {
+        background-color: #1c1e26;
+        color: #fff;
+    }
+
+    .stButton>button {
+        background-color: #ff4c98;
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+    }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
-st.title("🚨 Real-Time Fake Job Detector (BERT-Powered)")
-st.markdown("🧠 *Paste a job description below and instantly detect scams using our AI.*")
 
-job_input = st.text_area("📄 Paste Job Description", height=250)
+# --- Title Header ---
+st.markdown("## 🚨 Real-Time Fake Job Detector")
+st.markdown("### 💡 Paste a job description to check if it’s Real or Fake.")
 
-if st.button("🔍 Detect Now"):
+# --- Example Input Toggle ---
+col1, col2 = st.columns([1, 3])
+with col1:
+    st.radio("🌗 Theme:", ["Dark"], horizontal=True)
+with col2:
+    use_example = st.checkbox("💬 Use Example")
+    example_text = (
+        "We are seeking an enthusiastic individual to work remotely, no experience needed. "
+        "Earn $2000/week just by posting ads online!"
+    ) if use_example else ""
+
+# --- Text Input ---
+job_input = st.text_area("📝 Job Description", value=example_text, height=250)
+
+# --- Analyze Button ---
+if st.button("🔍 Analyze"):
     if not job_input.strip():
-        st.warning("⚠️ Please enter a job description to analyze.")
+        st.warning("⚠️ Please enter a job description.")
     else:
-        label, confidence = predict_fake_job_bert(job_input)
-        label_text = "❌ Fake" if label == 1 else "✅ Real"
-        st.markdown(f"### Prediction: **{label_text}**")
-        st.progress(confidence)
-        st.markdown(f"**Confidence:** `{round(confidence * 100, 2)}%`")
+        with st.spinner("🤖 Analyzing with AI..."):
+            label, confidence, model_pipeline = predict_fake_job(job_input)
+            label_text = "❌ Fake" if label == 1 else "✅ Real"
+            confidence_percent = round(confidence * 100, 2)
 
-        log_prediction(job_input, label, confidence)
+            # Auto-scroll to results
+            st.markdown("<script>window.scrollTo(0, document.body.scrollHeight);</script>", unsafe_allow_html=True)
 
-        if label == 1 and confidence > 0.7:
-            send_alert_email(job_input, confidence)
+            # 🎉 Confetti for Real Jobs
+            if label == 0:
+                st.balloons()
 
-        st.markdown("---")
-        st.caption("🛡️ Model powered by fine-tuned BERT + Streamlit UI")
+            # --- Results Display ---
+            st.subheader("🎯 Prediction Results")
+            st.metric(label="🔎 Prediction", value=label_text)
+            plot_prediction_bar(label, confidence)
+            plot_confidence_gauge(confidence)
 
-st.markdown("""<hr><center>Made with 💻 by Selvina Swarna</center>""", unsafe_allow_html=True)
+            # 🔉 Sound Alert if high-risk fake
+            if label == 1 and confidence > 0.9:
+                send_alert_email(job_input, confidence)
+                st.warning("🚨 High-Risk Fake Job Detected!")
+                st.audio("https://www.soundjay.com/button/beep-07.wav")
+
+            # 🤖 Chatbot-style Explanation
+            with st.expander("🤖 Why did the model predict this?"):
+                st.markdown("**🧠 AI says:**")
+                explanation_html = explain_prediction(model_pipeline, job_input, return_html=True)
+                st.markdown(f"<div style='background-color:#111111; padding:10px; border-radius:10px;'>{explanation_html}</div>", unsafe_allow_html=True)
+
+# --- Footer ---
+st.markdown("""<br><hr><center>
+Made with ❤️ by Selvina Swarna | Powered by AI + Streamlit
+</center>""", unsafe_allow_html=True)
+
+
+
