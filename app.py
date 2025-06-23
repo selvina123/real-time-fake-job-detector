@@ -5,7 +5,7 @@ import streamlit.components.v1 as components
 from pathlib import Path
 from utils.utils_predict import predict_fake_job
 from utils.utils_email_alert import send_alert_email
-from utils.utils_dashboard import plot_prediction_bar, plot_confidence_gauge
+from utils.utils_dashboard import plot_prediction_bar
 from utils.utils_explain_model import explain_prediction
 
 # --- Page Config ---
@@ -85,7 +85,7 @@ if st.button("🔍 Analyze"):
             st.subheader("🎯 Prediction Results")
             st.metric(label="🔎 Prediction", value=label_text)
             plot_prediction_bar(label, confidence)
-            plot_confidence_gauge(confidence)
+            
 
             # 🔉 Sound Alert if high-risk fake
             if label == 1 and confidence > 0.9:
