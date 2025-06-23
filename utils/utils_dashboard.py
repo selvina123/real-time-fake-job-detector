@@ -39,20 +39,3 @@ def plot_prediction_bar(label, confidence):
     fig.patch.set_facecolor('#0E1117')
 
     st.pyplot(fig)
-
-def plot_confidence_gauge(confidence):
-    """
-    Display a semicircle gauge to visualize confidence.
-    """
-    fig, ax = plt.subplots(figsize=(5, 2.5), subplot_kw={'projection': 'polar'})
-    theta = np.linspace(0, np.pi, 100)
-    radii = np.ones_like(theta)
-    colors = plt.cm.coolwarm(confidence)
-
-    ax.plot(theta, radii, linewidth=15, color=colors)
-    ax.fill_between(theta, 0, radii, color=colors, alpha=0.4)
-
-    ax.set_rticks([])
-    ax.set_xticks([])
-    ax.set_yticklabels([])
-    ax.set_thet_
