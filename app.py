@@ -5,7 +5,7 @@ import streamlit.components.v1 as components
 from pathlib import Path
 from utils.utils_predict import predict_fake_job
 from utils.utils_email_alert import send_alert_email
-from utils.utils_dashboard import plot_prediction_bar
+from utils.utils_dashboard import plot_prediction_bar  # Now includes animation!
 from utils.utils_explain_model import explain_prediction
 
 # --- Page Config ---
@@ -45,7 +45,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # --- Title Header ---
 st.markdown("## 🚨 Real-Time Fake Job Detector")
 st.markdown("### 💡 Paste a job description to check if it’s Real or Fake.")
@@ -84,8 +83,7 @@ if st.button("🔍 Analyze"):
             # --- Results Display ---
             st.subheader("🎯 Prediction Results")
             st.metric(label="🔎 Prediction", value=label_text)
-            plot_prediction_bar(label, confidence)
-            
+            plot_prediction_bar(label, confidence)  # Now includes animation + legend + accessibility
 
             # 🔉 Sound Alert if high-risk fake
             if label == 1 and confidence > 0.9:
@@ -96,8 +94,14 @@ if st.button("🔍 Analyze"):
             # 🤖 Chatbot-style Explanation
             with st.expander("🤖 Why did the model predict this?"):
                 st.markdown("**🧠 AI says:**")
-                explanation_html = explain_prediction(model_pipeline, job_input, return_html=True)
-                st.markdown(f"<div style='background-color:#111111; padding:10px; border-radius:10px;'>{explanation_html}</div>", unsafe_allow_html=True)
+                try:
+                    explanation_html = explain_prediction(model_pipeline, job_input, return_html=True)
+                    st.markdown(
+                        f"<div style='background-color:#111111; padding:10px; border-radius:10px;'>{explanation_html}</div>",
+                        unsafe_allow_html=True
+                    )
+                except TypeError:
+                    st.error("⚠️ Explanation rendering failed. Please check `explain_prediction()` function.")
 
 # --- Footer ---
 st.markdown("""<br><hr><center>
