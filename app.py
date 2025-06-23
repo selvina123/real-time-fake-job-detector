@@ -21,29 +21,47 @@ st.markdown(
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
+        color: #f5f5f5;
     }
 
     .block-container {
-        background-color: rgba(0, 0, 0, 0.6);
+        background-color: rgba(14, 17, 23, 0.8);
         padding: 2rem;
         border-radius: 15px;
     }
 
     textarea, .stTextInput>div>input {
-        background-color: #1c1e26;
-        color: #fff;
+        background-color: #1f1f2e;
+        color: #f5f5f5;
+        border: 1px solid #ff69b4;
+        border-radius: 8px;
     }
 
     .stButton>button {
-        background-color: #ff4c98;
+        background-color: #ff69b4;
         color: white;
         font-weight: bold;
         border-radius: 10px;
+        transition: 0.3s;
+    }
+
+    .stButton>button:hover {
+        background-color: #ff85c1;
+        transform: scale(1.02);
+    }
+
+    .stMarkdown h1, h2, h3, h4 {
+        color: #90ee90 !important;
+    }
+
+    .stMetric label {
+        color: #f5f5f5;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 # --- Title Header ---
 st.markdown("## 🚨 Real-Time Fake Job Detector")
