@@ -109,21 +109,11 @@ if st.button("🔍 Analyze"):
                 st.warning("🚨 High-Risk Fake Job Detected!")
                 st.audio("https://www.soundjay.com/button/beep-07.wav")
 
-            # 🤖 Chatbot-style Explanation
-            with st.expander("🤖 Why did the model predict this?"):
-                st.markdown("**🧠 AI says:**")
-                try:
-                    explanation_html = explain_prediction(model_pipeline, job_input, return_html=True)
-                    st.markdown(
-                        f"<div style='background-color:#111111; padding:10px; border-radius:10px;'>{explanation_html}</div>",
-                        unsafe_allow_html=True
-                    )
-                except TypeError:
-                    st.error("⚠️ Explanation rendering failed. Please check `explain_prediction()` function.")
+            
 
 # --- Footer ---
 st.markdown("""<br><hr><center>
-Made with ❤️ by Selvina Swarna | Powered by AI + Streamlit
+Made by by Selvina Swarna | Powered by AI + Streamlit
 </center>""", unsafe_allow_html=True)
 
 
