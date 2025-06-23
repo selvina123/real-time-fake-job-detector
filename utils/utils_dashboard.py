@@ -3,14 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 import time
 
-import streamlit as st
-import matplotlib.pyplot as plt
-import matplotlib.patheffects as path_effects
-import time
-
 def plot_prediction_bar(label, confidence):
     """
-    Sleek animated bar chart with soft neon colors and balanced layout.
+    Thin neon-style bar with light animation and elegant sizing.
     """
     confidence = round(confidence * 100, 2)
     fake_percent = confidence if label == 1 else 100 - confidence
@@ -21,7 +16,8 @@ def plot_prediction_bar(label, confidence):
 
     st.markdown("#### 🎯 Prediction Confidence")
     st.markdown(
-        f"**Accessibility Note:** This bar shows a confidence of **{confidence:.1f}%** that the job is **{'Fake' if label == 1 else 'Real'}**."
+        f"<small style='color:#ccc;'>This bar shows model confidence of <b>{confidence:.1f}%</b> that the job is <b>{'Fake' if label == 1 else 'Real'}</b>.</small>",
+        unsafe_allow_html=True
     )
 
     plot_placeholder = st.empty()
@@ -30,10 +26,13 @@ def plot_prediction_bar(label, confidence):
         current_fake = pct if label == 1 else 100 - pct
         current_real = 100 - current_fake
 
-        fig, ax = plt.subplots(figsize=(6, 1.2))  # Balanced height
-        ax.barh([''], [current_fake], color=colors[0], edgecolor='white')
-        ax.barh([''], [current_real], left=[current_fake], color=colors[1], edgecolor='white')
+        fig, ax = plt.subplots(figsize=(5.5, 0.3))  # 💡 Super thin bar height
 
+        # Main bars
+        ax.barh([0], [current_fake], color=colors[0], edgecolor='white', height=0.25)
+        ax.barh([0], [current_real], left=[current_fake], color=colors[1], edgecolor='white', height=0.25)
+
+        # Labels inside bars
         for i, v in enumerate([current_fake, current_real]):
             ax.text(
                 sum([current_fake if i == 1 else 0]) + v / 2,
@@ -43,7 +42,7 @@ def plot_prediction_bar(label, confidence):
                 va='center',
                 ha='center',
                 fontweight='bold',
-                fontsize=11,
+                fontsize=10,
                 path_effects=[path_effects.withStroke(linewidth=2, foreground='white')]
             )
 
@@ -54,16 +53,18 @@ def plot_prediction_bar(label, confidence):
         ax.set_facecolor('#0E1117')
         fig.patch.set_facecolor('#0E1117')
 
-        # Legend with better spacing
+        # Legend
         fig.legend(
             labels,
             loc="lower center",
-            bbox_to_anchor=(0.5, -0.25),
+            bbox_to_anchor=(0.5, -1.1),
             ncol=2,
             frameon=False,
-            fontsize=9,
+            fontsize=8,
             labelcolor='white'
         )
 
         plot_placeholder.pyplot(fig)
-        time.sleep(0.05)
+        time.sleep(0.04)
+
+
